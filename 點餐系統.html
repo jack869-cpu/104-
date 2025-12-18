@@ -264,112 +264,136 @@
   </section>
 </main>
 
-  <script>
-    /************** 基本設定 **************/
-    const ADMIN_PASSWORD = '1234';
+ <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-analytics.js";
+  import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
-    const state = {
-      current: null,
-      last: 0,
-      queue: [],
-      called: [] // 已叫過的號碼（避免重複顯示）
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyCDcLUp0hPrRIPDqV7nEGIY_p3547ol3EQ",
+    authDomain: "food-ad3d0.firebaseapp.com",
+    projectId: "food-ad3d0",
+    storageBucket: "food-ad3d0.firebasestorage.app",
+    messagingSenderId: "1098582550820",
+    appId: "1:1098582550820:web:92450df87636f18979ebb1",
+    measurementId: "G-76JKJ8W3B2"
+  };
 
-    /************** LocalStorage **************/
-    function load(){
-      const data = JSON.parse(localStorage.getItem('queueState'));
-      if(data) Object.assign(state,data);
-    }
-    function save(){ localStorage.setItem('queueState', JSON.stringify(state)); }
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const db = getFirestore(app);
 
-    /************** UI 更新 **************/
-    function render(){
-      document.getElementById('nowNumber').textContent = state.current ?? '—';
-      document.getElementById('statCurrent').textContent = state.current ?? '—';
-      document.getElementById('statWaiting').textContent = state.queue.length;
-      document.getElementById('statLast').textContent = state.last;
+  const state = {
+    current: null,
+    last: 0,
+    queue: [],
+    called: []
+  };
 
-      const list = document.getElementById('waitingList');
-      list.innerHTML='';
+  const stateDoc = doc(db, "queueState", "main");
+
+  async function saveToFirebase() {
+    await setDoc(stateDoc, state);
+  }
+
+  function render() {
+    document.getElementById('nowNumber').textContent = state.current ?? '—';
+    document.getElementById('statCurrent').textContent = state.current ?? '—';
+    document.getElementById('statWaiting').textContent = state.queue.length;
+    document.getElementById('statLast').textContent = state.last;
+
+    const list = document.getElementById('waitingList');
+    list.innerHTML = '';
+    if(state.queue.length === 0){
+      const empty = document.createElement('div');
+      empty.className = 'badge';
+      empty.textContent = '等待中…';
+      list.appendChild(empty);
+    } else {
       state.queue.slice(0,6).forEach(n=>{
-        const b=document.createElement('div');
-        b.className='badge';
-        b.textContent=n;
+        const b = document.createElement('div');
+        b.className = 'badge';
+        b.textContent = n;
         list.appendChild(b);
       });
     }
+  }
 
-    /************** 基本操作 **************/
-    document.getElementById('addNumber').onclick = ()=>{
-      state.last++;
-      state.queue.push(state.last);
-      save(); render();
-    };
-
-    document.getElementById('callNext').onclick = ()=>{
-      const next = state.queue.shift();
-      if(next!==undefined){
-        if(!state.called.includes(next)){
-          state.current = next;
-          state.called.push(next);
-        }
-      }
-      save(); render();
-    };
-
-    document.getElementById('resetAll').onclick = ()=>{
-      if(confirm('確定全部重置？')){
-        state.current=null;
-        state.last=0;
-        state.queue=[];
-        state.called=[];
-        save(); render();
-      }
-    };
-
-    /************** 新增：刪除 / 回復號碼 **************/
-    document.getElementById('deleteNumberBtn').onclick = ()=>{
-      const n = parseInt(document.getElementById('deleteNumber').value);
-      if(!state.queue.includes(n)){
-        alert('此號碼不在等待中'); return;
-      }
-      state.queue = state.queue.filter(x=>x!==n);
-      save(); render();
-    };
-
-    document.getElementById('restoreNumberBtn').onclick = ()=>{
-      const n = parseInt(document.getElementById('restoreNumber').value);
-      if(state.queue.includes(n) || state.called.includes(n)){
-        alert('⚠️ 此號碼已存在，避免重複叫號'); return;
-      }
-      state.queue.unshift(n);
-      save(); render();
-    };
-
-    /************** 導航 / 登入 **************/
-    const pageDisplay=document.getElementById('page-display');
-    const pageLogin=document.getElementById('page-login');
-    const pageCounter=document.getElementById('page-counter');
-
-    function show(p){
-      pageDisplay.style.display='none';
-      pageLogin.style.display='none';
-      pageCounter.style.display='none';
-      p.style.display='block';
+  // 即時同步
+  onSnapshot(stateDoc, (docSnap)=>{
+    if(docSnap.exists()){
+      Object.assign(state, docSnap.data());
+      render();
     }
+  });
 
-    document.getElementById('nav-display').onclick=()=>show(pageDisplay);
-    document.getElementById('nav-counter').onclick=()=>show(pageLogin);
+  document.getElementById('addNumber').onclick = async ()=>{
+    state.last++;
+    state.queue.push(state.last);
+    await saveToFirebase();
+  };
 
-    document.getElementById('loginBtn').onclick=()=>{
-      if(document.getElementById('password').value===ADMIN_PASSWORD){
-        show(pageCounter);
-      }else{
-        document.getElementById('loginError').textContent='密碼錯誤';
-      }
-    };
+  document.getElementById('callNext').onclick = async ()=>{
+    if(state.queue.length === 0){ alert('目前沒有等待號碼'); return; }
+    const next = state.queue.shift();
+    state.current = next;
+    state.called.push(next);
+    await saveToFirebase();
+  };
 
-    load(); render();
-  </script>
+  document.getElementById('resetAll').onclick = async ()=>{
+    if(confirm('確定全部重置？')){
+      state.current=null;
+      state.last=0;
+      state.queue=[];
+      state.called=[];
+      await saveToFirebase();
+    }
+  };
+
+  document.getElementById('deleteNumberBtn').onclick = async ()=>{
+    const n = parseInt(document.getElementById('deleteNumber').value);
+    if(!state.queue.includes(n)){ alert('此號碼不在等待中'); return; }
+    state.queue = state.queue.filter(x=>x!==n);
+    await saveToFirebase();
+  };
+
+  document.getElementById('restoreNumberBtn').onclick = async ()=>{
+    const n = parseInt(document.getElementById('restoreNumber').value);
+    if(state.queue.includes(n) || state.called.includes(n)){
+      alert('⚠️ 此號碼已存在，避免重複叫號'); return;
+    }
+    state.queue.unshift(n);
+    await saveToFirebase();
+  };
+
+  const pageDisplay=document.getElementById('page-display');
+  const pageLogin=document.getElementById('page-login');
+  const pageCounter=document.getElementById('page-counter');
+
+  function show(p){
+    pageDisplay.style.display='none';
+    pageLogin.style.display='none';
+    pageCounter.style.display='none';
+    p.style.display='block';
+  }
+
+  document.getElementById('nav-display').onclick=()=>show(pageDisplay);
+  document.getElementById('nav-counter').onclick=()=>show(pageLogin);
+
+  const ADMIN_PASSWORD = '1234';
+  document.getElementById('loginBtn').onclick=()=>{
+    if(document.getElementById('password').value===ADMIN_PASSWORD){
+      show(pageCounter);
+    } else {
+      document.getElementById('loginError').textContent='密碼錯誤';
+    }
+  };
+
+  render();
+</script>
+
+
+
 </body>
 </html>
