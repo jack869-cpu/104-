@@ -351,21 +351,40 @@
     }
   };
 
-  document.getElementById('deleteNumberBtn').onclick = async ()=>{
-    const n = parseInt(document.getElementById('deleteNumber').value);
-    if(!state.queue.includes(n)){ alert('此號碼不在等待中'); return; }
-    state.queue = state.queue.filter(x=>x!==n);
-    await saveToFirebase();
-  };
+document.getElementById('deleteNumberBtn').onclick = async ()=>{
+  const input = document.getElementById('deleteNumber');
+  const n = parseInt(input.value);
 
-  document.getElementById('restoreNumberBtn').onclick = async ()=>{
-    const n = parseInt(document.getElementById('restoreNumber').value);
-    if(state.queue.includes(n) || state.called.includes(n)){
-      alert('⚠️ 此號碼已存在，避免重複叫號'); return;
-    }
-    state.queue.unshift(n);
-    await saveToFirebase();
-  };
+  if(!state.queue.includes(n)){
+    alert('此號碼不在等待中');
+    return;
+  }
+
+  state.queue = state.queue.filter(x=>x!==n);
+  await saveToFirebase();
+
+  // ✅ 清空輸入框（手機立即生效）
+  input.value = '';
+  input.blur();
+};
+
+document.getElementById('restoreNumberBtn').onclick = async ()=>{
+  const input = document.getElementById('restoreNumber');
+  const n = parseInt(input.value);
+
+  if(state.queue.includes(n) || state.called.includes(n)){
+    alert('⚠️ 此號碼已存在，避免重複叫號');
+    return;
+  }
+
+  state.queue.unshift(n);
+  await saveToFirebase();
+
+  // ✅ 清空輸入框（手機立即生效）
+  input.value = '';
+  input.blur();
+};
+
 
   const pageDisplay=document.getElementById('page-display');
   const pageLogin=document.getElementById('page-login');
@@ -397,4 +416,6 @@
 
 </body>
 </html>
+
+
 
