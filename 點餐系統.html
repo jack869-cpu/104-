@@ -464,28 +464,55 @@ button:active{
     await setDoc(stateDoc, state);
   }
 
-  function render() {
-    document.getElementById('nowNumber').textContent = state.current ?? '—';
-    document.getElementById('statCurrent').textContent = state.current ?? '—';
-    document.getElementById('statWaiting').textContent = state.queue.length;
-    document.getElementById('statLast').textContent = state.last;
+function render() {
+  document.getElementById('nowNumber').textContent = state.current ?? '—';
+  document.getElementById('statCurrent').textContent = state.current ?? '—';
+  document.getElementById('statWaiting').textContent = state.queue.length;
+  document.getElementById('statLast').textContent = state.last;
 
-    const list = document.getElementById('waitingList');
-    list.innerHTML = '';
-    if(state.queue.length === 0){
-      const empty = document.createElement('div');
-      empty.className = 'badge';
-      empty.textContent = '等待中…';
-      list.appendChild(empty);
-    } else {
-      state.queue.slice(0,6).forEach(n=>{
-        const b = document.createElement('div');
-        b.className = 'badge';
-        b.textContent = n;
-        list.appendChild(b);
-      });
-    }
+  const list = document.getElementById('waitingList');
+  list.innerHTML = '';
+
+  if(state.queue.length === 0){
+    const empty = document.createElement('div');
+    empty.className = 'badge';
+    empty.textContent = '等待中…';
+    list.appendChild(empty);
+  } else {
+    state.queue.slice(0,6).forEach((n, index)=>{
+      const wrapper = document.createElement('div');
+      wrapper.style.position = 'relative';
+      wrapper.style.display = 'flex';
+      wrapper.style.flexDirection = 'column';
+      wrapper.style.alignItems = 'center';
+
+      if(index < 3){ // 最近三個號碼才顯示預計等待時間
+        const timeLabel = document.createElement('div');
+        let seconds = (index + 1) * 30;
+        let minutes = Math.floor(seconds / 60);
+        let sec = seconds % 60;
+        timeLabel.textContent = `預計於 ${minutes > 0 ? minutes+'分' : ''}${sec > 0 ? sec+'秒' : ''}`;
+        timeLabel.style.fontSize = '12px';
+        timeLabel.style.color = '#ef4444';
+        timeLabel.style.marginBottom = '4px';
+        wrapper.appendChild(timeLabel);
+      }
+
+      const b = document.createElement('div');
+      b.className = 'badge';
+      b.textContent = n;
+
+      if(index < 3){
+        b.style.background = '#ef4444';
+        b.style.color = '#020617';
+      }
+
+      wrapper.appendChild(b);
+      list.appendChild(wrapper);
+    });
   }
+}
+
   
 
   // 即時同步
@@ -583,7 +610,7 @@ document.getElementById('restoreNumberBtn').onclick = async ()=>{
 setTimeout(()=>{
   const promo = document.querySelector('#page-display .promo');
   if(promo) promo.classList.add('show');
-}, 300);
+}, 1200);
 
 </script>
 
@@ -591,8 +618,6 @@ setTimeout(()=>{
 
 </body>
 </html>
-
-
 
 
 
