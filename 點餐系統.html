@@ -227,6 +227,88 @@ button:active{
 .nav button:active{
   transform: scale(0.95);
 }
+/* =========================
+   顯示頁底部宣傳區
+   ========================= */
+
+.promo{
+  margin-top:20px;
+  padding:16px;
+  background:linear-gradient(135deg,#020617,#020617);
+  border-radius:var(--radius);
+  border:1px solid rgba(255,255,255,.1);
+}
+
+.promo h2{
+  margin:0 0 14px;
+  font-size:18px;
+  font-weight:900;
+  text-align:center;
+}
+
+.promo-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+}
+
+.promo-card{
+  background:var(--panel);
+  border-radius:12px;
+  padding:14px;
+  border:1px solid rgba(255,255,255,.08);
+}
+
+.promo-card h3{
+  margin:0 0 8px;
+  font-size:16px;
+}
+
+.promo-card ul{
+  padding-left:18px;
+  margin:0;
+}
+
+.promo-card li{
+  margin-bottom:8px;
+  font-size:14px;
+}
+
+.price{
+  font-size:18px;
+  font-weight:900;
+}
+
+.note{
+  font-size:13px;
+  color:var(--muted);
+}
+
+.promo-reward{
+  margin-top:14px;
+  padding:14px;
+  background:#020617;
+  border-radius:12px;
+  border:1px dashed rgba(56,189,248,.5);
+}
+
+.promo-reward h3{
+  margin:0 0 6px;
+  font-size:16px;
+}
+
+.promo-reward ul{
+  margin:6px 0 0;
+  padding-left:18px;
+  font-size:14px;
+}
+
+/* 平板以上橫向排 */
+@media (min-width:768px){
+  .promo-grid{
+    grid-template-columns:1fr 1fr;
+  }
+}
 
   </style>
 </head>
@@ -248,6 +330,39 @@ button:active{
 
     <div class="label">等待中</div>
     <div id="waitingList" class="queue"></div>
+    <!-- ===== 宣傳內容（只顯示頁底部） ===== -->
+<div class="promo">
+  <h2>🎯 地鼠遊戲玩法與價格</h2>
+
+  <div class="promo-grid">
+    <!-- NPC 模式 -->
+    <div class="promo-card">
+      <h3>🤖 NPC 地鼠模式</h3>
+      <ul>
+        <li><strong>單人打擊模式</strong><br>30 元／局</li>
+        <li><strong>混合雙打模式</strong><br>25 元／人／局</li>
+      </ul>
+    </div>
+
+    <!-- 多人組團 -->
+    <div class="promo-card">
+      <h3>👥 多人組團模式</h3>
+      <p class="price">20 元／人／局</p>
+      <p class="note">（最低 3 人）</p>
+    </div>
+  </div>
+
+  <!-- 獎勵制度 -->
+  <div class="promo-reward">
+    <h3>🎁 獎勵制度</h3>
+    <p>✨ 任一模式 <strong>滿 2 局</strong></p>
+    <ul>
+      <li>送一瓶 <strong>可爾必思水語</strong></li>
+      <li>🎯 <strong>美菊臂</strong> 再送 <strong>5 元折價券</strong></li>
+    </ul>
+  </div>
+</div>
+
   </section>
 
   <!-- ===== 登入頁 ===== -->
