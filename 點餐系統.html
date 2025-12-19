@@ -309,6 +309,22 @@ button:active{
     grid-template-columns:1fr 1fr;
   }
 }
+/* =========================
+   宣傳區自動淡入效果
+   ========================= */
+.promo{
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 1s ease,
+    transform 1s ease;
+}
+
+/* 觸發顯示 */
+.promo.show{
+  opacity: 1;
+  transform: translateY(0);
+}
 
   </style>
 </head>
@@ -470,6 +486,7 @@ button:active{
       });
     }
   }
+  
 
   // 即時同步
   onSnapshot(stateDoc, (docSnap)=>{
@@ -562,13 +579,18 @@ document.getElementById('restoreNumberBtn').onclick = async ()=>{
   };
 
   render();
+  // ⏱ 宣傳區延遲淡入（只影響顯示頁）
+setTimeout(()=>{
+  const promo = document.querySelector('#page-display .promo');
+  if(promo) promo.classList.add('show');
+}, 1200);
+
 </script>
 
 
 
 </body>
 </html>
-
 
 
 
