@@ -191,6 +191,43 @@
       .counter-actions{grid-template-columns:repeat(3,1fr)}
       .stats{grid-template-columns:repeat(3,1fr)}
     }
+    /* =========================
+   按鈕動態效果（全站）
+   ========================= */
+
+/* 基本動畫設定 */
+button{
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    filter 0.15s ease;
+  cursor: pointer;
+}
+
+/* 滑鼠 hover（桌機） */
+button:hover{
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(0,0,0,.35);
+  filter: brightness(1.05);
+}
+
+/* 按下瞬間（手機最重要） */
+button:active{
+  transform: translateY(1px) scale(0.97);
+  box-shadow: 0 3px 8px rgba(0,0,0,.4);
+  filter: brightness(0.95);
+}
+
+/* 讓大按鈕看起來更有層次 */
+.btn{
+  box-shadow: 0 6px 16px rgba(0,0,0,.3);
+}
+
+/* 導覽列按鈕也有反饋 */
+.nav button:active{
+  transform: scale(0.95);
+}
+
   </style>
 </head>
 <body>
