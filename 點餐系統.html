@@ -1,3 +1,5 @@
+請幫我把號碼框改更寬
+
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -97,14 +99,17 @@
       gap:12px;
     }
 
-    .badge{
-      padding:12px 0;
-      border-radius:999px;
-      background:#020617;
-      border:1px solid rgba(255,255,255,.15);
-      font-size:20px;
-      font-weight:700;
-    }
+.badge{
+  padding:12px 24px;      /* 左右加大 */
+  min-width:60px;          /* 最小寬度 */
+  text-align:center;       /* 文字置中 */
+  border-radius:999px;
+  background:#020617;
+  border:1px solid rgba(255,255,255,.15);
+  font-size:20px;
+  font-weight:700;
+}
+
 
     /* ===== 登入 ===== */
     .login input{
@@ -502,7 +507,10 @@ function render() {
       b.className = 'badge';
       b.textContent = n;
 
-
+      if(index < 3){
+        b.style.background = '#ef4444';
+        b.style.color = '#020617';
+      }
 
       wrapper.appendChild(b);
       list.appendChild(wrapper);
@@ -615,7 +623,6 @@ setTimeout(()=>{
 
 </body>
 </html>
-
 
 
 
